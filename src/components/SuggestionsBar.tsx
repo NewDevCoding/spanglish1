@@ -2,22 +2,27 @@ import React from 'react';
 
 interface SuggestionsBarProps {
   suggestions: string[];
-  onSuggestionClick: (s: string) => void;
+  onSuggestionClick: (suggestion: string) => void;
 }
 
-export default function SuggestionsBar({ suggestions, onSuggestionClick }: SuggestionsBarProps) {
-  if (!suggestions || suggestions.length === 0) return null;
+const SuggestionsBar: React.FC<SuggestionsBarProps> = ({ suggestions, onSuggestionClick }) => {
+  if (suggestions.length === 0) return null;
+
   return (
-    <div className="flex space-x-2 px-4 py-2 bg-gray-200 border-t overflow-x-auto">
-      {suggestions.map((s, i) => (
-        <button
-          key={i}
-          className="px-3 py-1 rounded bg-blue-300 text-blue-900 hover:bg-blue-400 text-sm whitespace-nowrap"
-          onClick={() => onSuggestionClick(s)}
-        >
-          {s}
-        </button>
-      ))}
+    <div className="p-3 bg-gray-50 border-t border-gray-200">
+      <div className="flex flex-wrap gap-2">
+        {suggestions.map((suggestion, index) => (
+          <button
+            key={index}
+            onClick={() => onSuggestionClick(suggestion)}
+            className="px-3 py-1.5 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition-colors duration-200 font-medium"
+          >
+            {suggestion}
+          </button>
+        ))}
+      </div>
     </div>
   );
-} 
+};
+
+export default SuggestionsBar; 

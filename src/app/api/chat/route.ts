@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
-  const { message, isInitial } = await req.json();
+  const { message, isInitial, conversationHistory } = await req.json();
   const apiKey = process.env.OPENAI_API_KEY;
 
   console.log('Chat request:', { message, isInitial });
@@ -20,16 +20,51 @@ export async function POST(req: NextRequest) {
       messages = [
         {
           role: 'system',
-          content: 'You are a friendly Spanish language tutor. Always respond in Spanish. Be encouraging and helpful. Keep responses conversational and not too long. Provide 3 helpful suggestions for what the user could say next.'
+          content: `Eres un amigo español muy amigable y casual. Hablas de manera informal y natural, como si fueras un compañero de conversación real. 
+
+Características:
+- Usa "tú" y lenguaje casual
+- Sé curioso y haz preguntas naturales
+- Construye sobre lo que la persona dice
+- No uses listas numeradas
+- Responde de manera conversacional y fluida
+- Muestra interés genuino: "¡Qué chévere!", "¡Genial!", "¡Increíble!"
+- Haz preguntas de seguimiento naturales
+- Comparte opiniones y experiencias personales
+- Mantén un tono amigable y relajado
+
+Ejemplo de estilo:
+"¡Hola! ¿Qué tal? Me encanta conocer gente nueva. ¿De dónde eres? ¡Qué padre! Yo soy de Madrid, pero me encanta viajar. ¿Has estado en España alguna vez?"
+
+Proporciona 3 sugerencias conversacionales naturales (no numeradas) al final de tu respuesta.`
         }
       ];
     } else {
-      // Continue conversation
+      // Continue conversation with full history
       messages = [
         {
           role: 'system',
-          content: 'You are a friendly Spanish language tutor. Always respond in Spanish. Be encouraging and helpful. Keep responses conversational and not too long. Provide 3 helpful suggestions for what the user could say next.'
+          content: `Eres un amigo español muy amigable y casual. Hablas de manera informal y natural, como si fueras un compañero de conversación real. 
+
+Características:
+- Usa "tú" y lenguaje casual
+- Sé curioso y haz preguntas naturales
+- Construye sobre lo que la persona dice
+- No uses listas numeradas
+- Responde de manera conversacional y fluida
+- Muestra interés genuino: "¡Qué chévere!", "¡Genial!", "¡Increíble!"
+- Haz preguntas de seguimiento naturales
+- Comparte opiniones y experiencias personales
+- Mantén un tono amigable y relajado
+- Recuerda el contexto de la conversación anterior
+
+Ejemplo de estilo:
+"¡Ay, me encantan las películas! ¿Qué tipo te gusta más a ti? Yo soy súper fan de las comedias románticas, aunque también me gustan las de acción cuando quiero algo emocionante. ¿Cuál fue la última película que viste y te encantó?"
+
+Proporciona 3 sugerencias conversacionales naturales (no numeradas) al final de tu respuesta.`
         },
+        // Add conversation history
+        ...conversationHistory,
         {
           role: 'user',
           content: message
@@ -37,7 +72,7 @@ export async function POST(req: NextRequest) {
       ];
     }
 
-    console.log('Calling OpenAI API with messages:', messages);
+    console.log('Calling OpenAI API with messages:', messages.length, 'messages');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -48,8 +83,8 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-3.5-turbo',
         messages,
-        max_tokens: 200,
-        temperature: 0.7,
+        max_tokens: 300,
+        temperature: 0.8,
       }),
     });
 
@@ -66,11 +101,11 @@ export async function POST(req: NextRequest) {
 
     const aiResponse = data.choices[0].message.content;
     
-    // Extract suggestions from the response (assuming they're provided)
+    // Extract suggestions from the response (they should be conversational now)
     const suggestions = [
-      '¿Cómo estás?',
-      '¿De dónde eres?',
-      '¿Qué te gusta hacer?'
+      '¿Qué tal tu día?',
+      '¿Qué te gusta hacer?',
+      '¿Cuéntame más sobre ti?'
     ];
 
     return NextResponse.json({

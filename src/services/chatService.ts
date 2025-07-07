@@ -36,30 +36,40 @@ const chatService = {
         message: {
           id: Date.now() + '-ai',
           sender: 'ai',
-          originalText: '¡Hola! ¿Cómo estás?',
+          originalText: '¡Hola! ¿Qué tal? Me encanta conocer gente nueva. ¿De dónde eres?',
           translatedText: '',
           timestamp: new Date(),
           suggestions: [
-            'Estoy bien, gracias. ¿Y tú?',
-            '¿De dónde eres?',
-            '¿Qué te gusta hacer en tu tiempo libre?'
+            '¿Qué tal tu día?',
+            '¿Qué te gusta hacer?',
+            '¿Cuéntame más sobre ti?'
           ],
         },
         suggestions: [
-          'Estoy bien, gracias. ¿Y tú?',
-          '¿De dónde eres?',
-          '¿Qué te gusta hacer en tu tiempo libre?'
+          '¿Qué tal tu día?',
+          '¿Qué te gusta hacer?',
+          '¿Cuéntame más sobre ti?'
         ]
       };
     }
   },
 
-  async getAIResponse(userText: string): Promise<AIResponse> {
+  async getAIResponse(userText: string, conversationHistory: Message[]): Promise<AIResponse> {
     try {
+      // Convert conversation history to OpenAI format
+      const history = conversationHistory.map(msg => ({
+        role: msg.sender === 'ai' ? 'assistant' : 'user',
+        content: msg.originalText
+      }));
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userText, isInitial: false }),
+        body: JSON.stringify({ 
+          message: userText, 
+          isInitial: false,
+          conversationHistory: history
+        }),
       });
       const data = await res.json();
       
@@ -80,7 +90,7 @@ const chatService = {
       };
     } catch (e: any) {
       // Fallback to mock if API fails
-      const aiResponse = `¡Interesante! ${userText} (cuéntame más)`;
+      const aiResponse = `¡Qué chévere! ${userText} Me encanta eso. ¿Cuéntame más?`;
       return {
         message: {
           id: Date.now() + '-ai',
@@ -89,15 +99,15 @@ const chatService = {
           translatedText: '',
           timestamp: new Date(),
           suggestions: [
-            '¿Por qué piensas eso?',
-            '¿Puedes darme un ejemplo?',
-            '¿Qué más te gustaría compartir?'
+            '¿Qué más te gusta?',
+            '¿Cuéntame más sobre eso?',
+            '¿Qué opinas de...?'
           ],
         },
         suggestions: [
-          '¿Por qué piensas eso?',
-          '¿Puedes darme un ejemplo?',
-          '¿Qué más te gustaría compartir?'
+          '¿Qué más te gusta?',
+          '¿Cuéntame más sobre eso?',
+          '¿Qué opinas de...?'
         ]
       };
     }
