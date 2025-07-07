@@ -11,21 +11,24 @@ export default function MessageBubble({ message, onUserMessage }: MessageBubbleP
   const isAI = message.sender === 'ai';
   const [isPlaying, setIsPlaying] = useState(false);
 
+  // Set up TTS state change callback
+  useEffect(() => {
+    ttsService.onPlayStateChange((playing: boolean) => {
+      setIsPlaying(playing);
+    });
+  }, []);
+
   // Auto-play TTS for AI messages
   useEffect(() => {
     if (isAI && message.originalText) {
       // Small delay to ensure the message is rendered
       const timer = setTimeout(() => {
-        setIsPlaying(true);
-        ttsService.speak(message.originalText).finally(() => {
-          setIsPlaying(false);
-        });
+        ttsService.speak(message.originalText);
       }, 500);
       
       return () => {
         clearTimeout(timer);
         ttsService.stop();
-        setIsPlaying(false);
       };
     }
   }, [isAI, message.originalText]);
@@ -40,7 +43,6 @@ export default function MessageBubble({ message, onUserMessage }: MessageBubbleP
   const handleStopTTS = () => {
     console.log('Stop button clicked');
     ttsService.stop();
-    setIsPlaying(false);
   };
 
   return (

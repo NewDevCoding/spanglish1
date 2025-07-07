@@ -1,5 +1,7 @@
 let currentAudio: HTMLAudioElement | null = null;
 let currentUtterance: SpeechSynthesisUtterance | null = null;
+let isCurrentlyPlaying = false;
+let onPlayStateChange: ((playing: boolean) => void) | null = null;
 
 const ttsService = {
   async speak(text: string): Promise<void> {
@@ -26,14 +28,33 @@ const ttsService = {
       const audioUrl = URL.createObjectURL(audioBlob);
       currentAudio = new Audio(audioUrl);
       
-      // Play the audio
-      await currentAudio.play();
+      // Set up event listeners
+      currentAudio.onplay = () => {
+        isCurrentlyPlaying = true;
+        if (onPlayStateChange) onPlayStateChange(true);
+      };
       
-      // Clean up the URL after playing
       currentAudio.onended = () => {
+        isCurrentlyPlaying = false;
+        if (onPlayStateChange) onPlayStateChange(false);
         URL.revokeObjectURL(audioUrl);
         currentAudio = null;
       };
+
+      currentAudio.onpause = () => {
+        isCurrentlyPlaying = false;
+        if (onPlayStateChange) onPlayStateChange(false);
+      };
+
+      currentAudio.onerror = () => {
+        isCurrentlyPlaying = false;
+        if (onPlayStateChange) onPlayStateChange(false);
+        URL.revokeObjectURL(audioUrl);
+        currentAudio = null;
+      };
+      
+      // Play the audio
+      await currentAudio.play();
 
     } catch (error) {
       console.error('TTS error:', error);
@@ -52,11 +73,20 @@ const ttsService = {
       utterance.rate = 0.9; // Slightly slower for clarity
       currentUtterance = utterance;
       
+      utterance.onstart = () => {
+        isCurrentlyPlaying = true;
+        if (onPlayStateChange) onPlayStateChange(true);
+      };
+      
       utterance.onend = () => {
+        isCurrentlyPlaying = false;
+        if (onPlayStateChange) onPlayStateChange(false);
         currentUtterance = null;
       };
       
       utterance.onerror = () => {
+        isCurrentlyPlaying = false;
+        if (onPlayStateChange) onPlayStateChange(false);
         currentUtterance = null;
       };
       
@@ -82,12 +112,19 @@ const ttsService = {
       speechSynthesis.cancel();
       currentUtterance = null;
     }
+
+    // Update state
+    isCurrentlyPlaying = false;
+    if (onPlayStateChange) onPlayStateChange(false);
   },
 
   isPlaying(): boolean {
-    const audioPlaying = currentAudio && !currentAudio.paused && !currentAudio.ended;
-    const synthesisPlaying = currentUtterance && speechSynthesis.speaking;
-    return Boolean(audioPlaying) || Boolean(synthesisPlaying);
+    return isCurrentlyPlaying;
+  },
+
+  // Add callback for state changes
+  onPlayStateChange(callback: (playing: boolean) => void): void {
+    onPlayStateChange = callback;
   }
 };
 
