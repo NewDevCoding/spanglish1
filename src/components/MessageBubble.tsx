@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Message } from '../utils/formatters';
+import ttsService from '../services/ttsService';
 
 type MessageBubbleProps = {
   message: Message;
@@ -7,6 +8,19 @@ type MessageBubbleProps = {
 
 export default function MessageBubble({ message }: MessageBubbleProps) {
   const isAI = message.sender === 'ai';
+
+  // Auto-play TTS for AI messages
+  useEffect(() => {
+    if (isAI && message.originalText) {
+      // Small delay to ensure the message is rendered
+      const timer = setTimeout(() => {
+        ttsService.speak(message.originalText);
+      }, 500);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAI, message.originalText]);
+
   return (
     <div className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}>
       <div className={`max-w-xs p-3 rounded-lg shadow ${isAI ? 'bg-blue-100 text-blue-900' : 'bg-green-100 text-green-900'}`}>
