@@ -89,8 +89,9 @@ export default function HomePage() {
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setInputText(suggestion);
+  const handleSuggestionClick = async (suggestion: string) => {
+    // Auto-send the suggestion as a message
+    await handleSendMessage(suggestion);
   };
 
   const handleUserMessage = () => {

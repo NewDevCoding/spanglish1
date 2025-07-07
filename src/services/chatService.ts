@@ -40,15 +40,15 @@ const chatService = {
           translatedText: '',
           timestamp: new Date(),
           suggestions: [
-            '¿Qué tal tu día?',
-            '¿Qué te gusta hacer?',
-            '¿Cuéntame más sobre ti?'
+            '¿Y tú de dónde eres?',
+            'Me llamo Juan',
+            '¿Qué te gusta hacer?'
           ],
         },
         suggestions: [
-          '¿Qué tal tu día?',
-          '¿Qué te gusta hacer?',
-          '¿Cuéntame más sobre ti?'
+          '¿Y tú de dónde eres?',
+          'Me llamo Juan',
+          '¿Qué te gusta hacer?'
         ]
       };
     }
@@ -100,14 +100,14 @@ const chatService = {
           timestamp: new Date(),
           suggestions: [
             '¿Qué más te gusta?',
-            '¿Cuéntame más sobre eso?',
-            '¿Qué opinas de...?'
+            'Cuéntame más',
+            '¿Qué opinas?'
           ],
         },
         suggestions: [
           '¿Qué más te gusta?',
-          '¿Cuéntame más sobre eso?',
-          '¿Qué opinas de...?'
+          'Cuéntame más',
+          '¿Qué opinas?'
         ]
       };
     }

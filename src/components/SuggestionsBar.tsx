@@ -15,7 +15,8 @@ const SuggestionsBar: React.FC<SuggestionsBarProps> = ({ suggestions, onSuggesti
           <button
             key={index}
             onClick={() => onSuggestionClick(suggestion)}
-            className="px-3 py-1.5 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition-colors duration-200 font-medium"
+            className="px-3 py-1.5 text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-full transition-colors duration-200 font-medium hover:shadow-sm"
+            title={`Send: ${suggestion}`}
           >
             {suggestion}
           </button>
