@@ -10,11 +10,15 @@ type MessageBubbleProps = {
 export default function MessageBubble({ message, onUserMessage }: MessageBubbleProps) {
   const isAI = message.sender === 'ai';
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasPlayed, setHasPlayed] = useState(false);
 
   // Set up TTS state change callback
   useEffect(() => {
     ttsService.onPlayStateChange((playing: boolean) => {
       setIsPlaying(playing);
+      if (playing) {
+        setHasPlayed(true);
+      }
     });
   }, []);
 
@@ -45,6 +49,11 @@ export default function MessageBubble({ message, onUserMessage }: MessageBubbleP
     ttsService.stop();
   };
 
+  const handlePlayTTS = () => {
+    console.log('Play button clicked');
+    ttsService.speak(message.originalText);
+  };
+
   return (
     <div className={`flex ${isAI ? 'justify-start' : 'justify-end'}`}>
       <div className={`max-w-xs p-3 rounded-lg shadow ${isAI ? 'bg-blue-100 text-blue-900' : 'bg-green-100 text-green-900'}`}>
@@ -60,18 +69,25 @@ export default function MessageBubble({ message, onUserMessage }: MessageBubbleP
                 <span className="ml-1">Playing...</span>
               </div>
             )}
-            <button
-              onClick={handleStopTTS}
-              disabled={!isPlaying}
-              className={`ml-2 px-2 py-1 rounded text-xs transition-colors ${
-                isPlaying 
-                  ? 'bg-red-500 text-white hover:bg-red-600 active:bg-red-700' 
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              }`}
-              title={isPlaying ? "Stop audio" : "No audio playing"}
-            >
-              ⏹️ Stop
-            </button>
+            <div className="flex gap-2">
+              {isPlaying ? (
+                <button
+                  onClick={handleStopTTS}
+                  className="px-2 py-1 rounded text-xs bg-red-500 text-white hover:bg-red-600 active:bg-red-700 transition-colors"
+                  title="Stop audio"
+                >
+                  ⏹️ Stop
+                </button>
+              ) : hasPlayed ? (
+                <button
+                  onClick={handlePlayTTS}
+                  className="px-2 py-1 rounded text-xs bg-green-500 text-white hover:bg-green-600 active:bg-green-700 transition-colors"
+                  title="Play audio again"
+                >
+                  ▶️ Play
+                </button>
+              ) : null}
+            </div>
           </div>
         )}
         

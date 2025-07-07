@@ -60,6 +60,9 @@ export default function HomePage() {
 
     setMessages(prev => [...prev, userMessage]);
     setLoading(true);
+    
+    // Clear the input field immediately after sending
+    setInputText("");
 
     try {
       // Translate user message

@@ -55,7 +55,7 @@ export default function InputBar({ value, onChange, onSend, loading }: InputBarP
         </span>
       </button>
       <input
-        className="flex-1 p-2 rounded border border-gray-300 focus:outline-none focus:ring"
+        className="flex-1 p-2 rounded border border-gray-300 focus:outline-none focus:ring text-black placeholder-gray-500"
         type="text"
         value={value}
         onChange={handleInputChange}
